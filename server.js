@@ -9,10 +9,15 @@ const app = express();
 const PORT = process.env.PORT;
 
 // Route Definitions
+app.get('/', rootHandler);
 app.use('*', notFoundHandler);
 app.use(errorHandler);
 
 // Route Handlers
+function rootHandler(request, response){
+  response.status(200).send('City Explorer App')
+}
+
 function notFoundHandler(request, response) {
   response.status(404).json({ notFound: true });
 }
