@@ -6,39 +6,13 @@ require('dotenv').config();
 
 // Application Setup
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT;
 
 // Route Definitions
-app.use(express.static('./public'));
-app.get('/greet', greetHandler);
-app.get('/data', dataHandler);
-app.get('/error', (request, response) => {
-  throw new Error('Try again later');
-});
 app.use('*', notFoundHandler);
 app.use(errorHandler);
 
 // Route Handlers
-function greetHandler(request, response) {
-  response.status(200).send('Hello!');
-}
-
-function dataHandler(request, response) {
-  const airplanes = [
-    {
-      departure: new Date(2020, 7, 24),
-      canFly: true,
-      pilot: 'Well Trained'
-    },
-    {
-      departure: new Date(2020, 7, 25),
-      canFly: false,
-      pilot: 'NA'
-    }
-  ];
-  response.status(200).json(airplanes);
-}
-
 function notFoundHandler(request, response) {
   response.status(404).json({ notFound: true });
 }
