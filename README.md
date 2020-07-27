@@ -1,2 +1,0 @@
-# city-explorer
-Api practice 
