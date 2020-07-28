@@ -28,10 +28,8 @@ function locationHandler(request, response) {
 }
 
 function weatherHandler(request, response){
-  const city = 'seattle';
-  const weatherData = require('./data/weather.json');
-  const weather = new Weather(city, weatherData);
-  response.status(200).send(weather);
+  const weatherResults = arrayOfForecasts.map(forecast => new Weather(forecast));
+  response.status(200).send(weatherResults);
 }
 
 function rootHandler(request, response){
