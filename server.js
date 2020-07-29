@@ -4,40 +4,51 @@
 const express = require('express');
 require('dotenv').config();
 const cors = require('cors');
+const superagent = require('superagent');
 
 // Application Setup
 const app = express();
 const PORT = process.env.PORT;
 
-
-
 // Route Definitions
 app.get('/', rootHandler);
 app.get('/location', locationHandler)
-app.get('/weather', weatherHandler)
+// app.get('/weather', weatherHandler)
 app.use('*', notFoundHandler);
 app.use(cors());
 app.use(errorHandler);
 
 // Route Handlers
 function locationHandler(request, response) {
-  const city = 'seattle';
-  const locationData = require('./data/location.json');
-  const location = new Location(city, locationData);
-  response.status(200).send(location);
+  const city = request.query.city;
+  superagent.get(url)
+    .query({
+      key: YOUR_PRIVATE_TOKEN,
+      q: city,
+      format: 'json'
+    })
+    .then(locationIQResponse => {
+      const topLocation = locationIQResponse.body[0];
+      const myLocationResponse = new Location(city, topLocation);
+      response.status(200).send(location);
+    })
+    .catch(err => {
+      console.log(err);
+      errorHandler(err, request, response);
+    });
 }
 
-function weatherHandler(request, response){
-  const weatherResults = arrayOfForecasts.map(forecast => new Weather(forecast));
-  response.status(200).send(weatherResults);
-}
+// function weatherHandler(request, response) {
+//   const weatherResults = arrayOfForecasts.map(forecast => new Weather(forecast));
+//   response.status(200).send(weatherResults);
+// }
 
-function rootHandler(request, response){
-  response.status(200).send('City Explorer App')
+function rootHandler(request, response) {
+  response.status(200).send('City Explorer App');
 }
 
 function notFoundHandler(request, response) {
-  response.status(404).json({ notFound: true, message: 'That page does not exist.'});
+  response.status(404).json({ notFound: true, message: 'That page does not exist.' });
 }
 
 function errorHandler(error, request, response, next) { // eslint-disable-line
