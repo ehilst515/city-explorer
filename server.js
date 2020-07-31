@@ -13,7 +13,7 @@ const app = express();
 
 // const DATABASE = process.env.DATABASE_URL;
 app.use(cors());
-if(!process.env.DATABASE_URL) {
+if (!process.env.DATABASE_URL) {
   throw new Error('Missing database URL.');
 }
 const client = new pg.Client(process.env.DATABASE_URL);
@@ -47,7 +47,7 @@ function getLocationData(city) {
   const values = [city];
   return client.query(SQL, values)
     .then((results) => {
-      if(results.rowCount > 0) {
+      if (results.rowCount > 0) {
         return results.rows[0];
       } else {
         const url = 'https://us1.locationiq.com/v1/search.php';
@@ -110,8 +110,26 @@ function restaurantHandler(request, response) {
 }
 
 function weatherHandler(request, response) {
-  // const weatherResults = arrayOfForecasts.map(forecast => new Weather(forecast));
-  response.status(200).json({});
+  const url = 'HTTPS: https://api.weatherbit.io/v2.0/forecast/daily';
+  const lat = parseFloat(request.query.latitude);
+  const lon = parseFloat(request.query.longitude);
+  superagent.get(url)
+    .query({
+      key: process.env.WEATHER_KEY,
+      lat: lat,
+      lon: lon,
+    })
+    .then(weatherInfo => {
+      const weatherData = weatherInfo.body.data;
+      const weatherArray = weatherData;
+      const weatherResults = [];
+      weatherArray.forEach(location => {
+        weatherResults.push(new Weather(location));
+      });
+      response.send(weatherInfo);
+      response.status(200).send(weatherData);
+    })
+    .catch(error => console.log(error));
 }
 
 function movieHandler(request, response) {
@@ -145,28 +163,25 @@ function Location(city, locationData) {
   this.longitude = parseFloat(locationData.lon);
 }
 
-function Weather(city, weatherData) {
-  this.search_query = city;
-  this.formatted_query = location.display_name;
-  this.latitude = parseFloat(weatherData[0].lat);
-  this.longitude = parseFloat(weatherData[0].lon);
-}
+function Weather(data) {
+  this.time = data.datetime;
+  this.forecast = data.weather.description;
 
-function Restaurant(obj) {
-  this.name = obj.name;
-  this.url = obj.url;
-  this.rating = obj.rating;
-  this.price = obj.price;
-  this.image_url = obj.image_url;
-}
+  function Restaurant(obj) {
+    this.name = obj.name;
+    this.url = obj.url;
+    this.rating = obj.rating;
+    this.price = obj.price;
+    this.image_url = obj.image_url;
+  }
 
-// App listener
-client.connect()
-  .then(() => {
-    console.log('Postgres connected.');
-    app.listen(PORT,() => console.log(`Listening on port ${PORT}`));
-  })
-  .catch(err => {
-    throw `Postgres error: ${err.message}`;
-  });
+  // App listener
+  client.connect()
+    .then(() => {
+      console.log('Postgres connected.');
+      app.listen(PORT, () => console.log(`Listening on port ${PORT}`));
+    })
+    .catch(err => {
+      throw `Postgres error: ${err.message}`;
+    });
 
