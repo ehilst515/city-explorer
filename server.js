@@ -133,7 +133,10 @@ function weatherHandler(request, response) {
 }
 
 function movieHandler(request, response) {
-  // const weatherResults = arrayOfForecasts.map(forecast => new Weather(forecast));
+  const url = 'https://api.themoviedb.org/3/search/movie';
+  superagent.get(url)
+    .query({});
+
   response.status(200).json({});
 }
 
