@@ -23,7 +23,9 @@ client.on('error', err => { throw err; });
 app.get('/', rootHandler);
 app.get('/location', locationHandler);
 app.get('/yelp', restaurantHandler);
-// app.get('/weather', weatherHandler);
+app.get('/weather', weatherHandler);
+app.get('/movies', movieHandler);
+app.get('/trails', trailHandler);
 app.use('*', notFoundHandler);
 app.use(errorHandler);
 
@@ -108,9 +110,20 @@ function restaurantHandler(request, response) {
 }
 
 function weatherHandler(request, response) {
-  const weatherResults = arrayOfForecasts.map(forecast => new Weather(forecast));
-  response.status(200).send(weatherResults);
+  // const weatherResults = arrayOfForecasts.map(forecast => new Weather(forecast));
+  response.status(200).json({});
 }
+
+function movieHandler(request, response) {
+  // const weatherResults = arrayOfForecasts.map(forecast => new Weather(forecast));
+  response.status(200).json({});
+}
+
+function trailHandler(request, response) {
+  // const weatherResults = arrayOfForecasts.map(forecast => new Weather(forecast));
+  response.status(200).json({});
+}
+
 
 function rootHandler(request, response) {
   response.status(200).send('City Explorer App');
