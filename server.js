@@ -138,8 +138,25 @@ function movieHandler(request, response) {
 }
 
 function trailHandler(request, response) {
-  // const weatherResults = arrayOfForecasts.map(forecast => new Weather(forecast));
-  response.status(200).json({});
+  const url = 'https://www.hikingproject.com/data/get-trails';
+  const lat = parseFloat(request.query.latitude);
+  const lon = parseFloat(request.query.longitude);
+  superagent.get(url)
+    .query({
+      key: process.env.TRAIL_KEY,
+      lat: lat,
+      lon: lon,
+    })
+    .then( trailData => {
+      const trialDataArray = trailData.body.trails;
+      const trailResults = [];
+      trialDataArray.forEach(trail =>{
+        trailResults.push(new Trail(trail));
+      });
+      response.send(trailResults);
+      response.status(200).send(trialDataArray);
+    })
+    .catch(error => console.log(error));
 }
 
 function rootHandler(request, response) {
@@ -173,6 +190,19 @@ function Restaurant(obj) {
   this.rating = obj.rating;
   this.price = obj.price;
   this.image_url = obj.image_url;
+}
+
+function Trail(info){
+  this.name = info.name;
+  this.location = info.location;
+  this.length = info.length;
+  this.stars = info.stars;
+  this.star_votes = info.starVotes;
+  this.summary = info.summary;
+  this.trail_url = info.url;
+  this.conditions = info.conditionStatus;
+  this.condition_date = info.conditionDate.slice(0,10);
+  this.condition_time = info.conditionDate.slice(12);
 }
 
 // App listener
