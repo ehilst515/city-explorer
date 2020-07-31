@@ -110,7 +110,7 @@ function restaurantHandler(request, response) {
 }
 
 function weatherHandler(request, response) {
-  const url = 'HTTPS: https://api.weatherbit.io/v2.0/forecast/daily';
+  const url = 'https://api.weatherbit.io/v2.0/forecast/daily';
   const lat = parseFloat(request.query.latitude);
   const lon = parseFloat(request.query.longitude);
   superagent.get(url)
@@ -126,7 +126,7 @@ function weatherHandler(request, response) {
       weatherArray.forEach(location => {
         weatherResults.push(new Weather(location));
       });
-      response.send(weatherInfo);
+      response.send(weatherResults);
       response.status(200).send(weatherData);
     })
     .catch(error => console.log(error));
@@ -141,7 +141,6 @@ function trailHandler(request, response) {
   // const weatherResults = arrayOfForecasts.map(forecast => new Weather(forecast));
   response.status(200).json({});
 }
-
 
 function rootHandler(request, response) {
   response.status(200).send('City Explorer App');
@@ -166,22 +165,22 @@ function Location(city, locationData) {
 function Weather(data) {
   this.time = data.datetime;
   this.forecast = data.weather.description;
+}
 
-  function Restaurant(obj) {
-    this.name = obj.name;
-    this.url = obj.url;
-    this.rating = obj.rating;
-    this.price = obj.price;
-    this.image_url = obj.image_url;
-  }
+function Restaurant(obj) {
+  this.name = obj.name;
+  this.url = obj.url;
+  this.rating = obj.rating;
+  this.price = obj.price;
+  this.image_url = obj.image_url;
+}
 
-  // App listener
-  client.connect()
-    .then(() => {
-      console.log('Postgres connected.');
-      app.listen(PORT, () => console.log(`Listening on port ${PORT}`));
-    })
-    .catch(err => {
-      throw `Postgres error: ${err.message}`;
-    });
-
+// App listener
+client.connect()
+  .then(() => {
+    console.log('Postgres connected.');
+    app.listen(PORT, () => console.log(`Listening on port ${PORT}`));
+  })
+  .catch(err => {
+    throw `Postgres error: ${err.message}`;
+  });
