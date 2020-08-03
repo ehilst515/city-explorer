@@ -127,17 +127,29 @@ function weatherHandler(request, response) {
         weatherResults.push(new Weather(location));
       });
       response.send(weatherResults);
-      response.status(200).send(weatherData);
+      response.status(200).send(weatherArray);
     })
     .catch(error => console.log(error));
 }
 
 function movieHandler(request, response) {
   const url = 'https://api.themoviedb.org/3/search/movie';
+  const title = request.query.search_query;
   superagent.get(url)
-    .query({});
-
-  response.status(200).json({});
+    .query({
+      api_key: process.env.MOVIE_KEY,
+      query: title
+    })
+    .then(movieInfo => {
+      const movieData = movieInfo.body.results;
+      const movieResults = [];
+      movieData.forEach(movie => {
+        movieResults.push(new Movie(movie));
+      });
+      response.send(movieResults);
+      response.status(200).send(movieData);
+    })
+    .catch(error => console.log(error));
 }
 
 function trailHandler(request, response) {
@@ -150,10 +162,10 @@ function trailHandler(request, response) {
       lat: lat,
       lon: lon,
     })
-    .then( trailData => {
+    .then(trailData => {
       const trialDataArray = trailData.body.trails;
       const trailResults = [];
-      trialDataArray.forEach(trail =>{
+      trialDataArray.forEach(trail => {
         trailResults.push(new Trail(trail));
       });
       response.send(trailResults);
@@ -195,7 +207,7 @@ function Restaurant(obj) {
   this.image_url = obj.image_url;
 }
 
-function Trail(info){
+function Trail(info) {
   this.name = info.name;
   this.location = info.location;
   this.length = info.length;
@@ -204,8 +216,17 @@ function Trail(info){
   this.summary = info.summary;
   this.trail_url = info.url;
   this.conditions = info.conditionStatus;
-  this.condition_date = info.conditionDate.slice(0,10);
+  this.condition_date = info.conditionDate.slice(0, 10);
   this.condition_time = info.conditionDate.slice(12);
+}
+
+function Movie(movie) {
+  this.title = movie.original_title;
+  this.released_on = movie.released_date;
+  this.total_votes = movie.vote_count;
+  this.average_votes = movie.vote_average;
+  this.image_url = `https://image.tmdb.org/t/p/w780${movie.poster_path}`;
+  this.overview = movie.overview;
 }
 
 // App listener
