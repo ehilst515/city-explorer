@@ -137,18 +137,17 @@ function movieHandler(request, response) {
   const title = request.query.search_query;
   superagent.get(url)
     .query({
-      key: process.env.MOVIE_KEY,
+      api_key: process.env.MOVIE_KEY,
       query: title
     })
     .then(movieInfo => {
       const movieData = movieInfo.body.results;
-      const movieArray = movieData;
       const movieResults = [];
-      movieArray.forEach(movie => {
+      movieData.forEach(movie => {
         movieResults.push(new Movie(movie));
       });
       response.send(movieResults);
-      response.status(200).send(movieArray);
+      response.status(200).send(movieData);
     })
     .catch(error => console.log(error));
 }
